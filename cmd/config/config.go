@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/3WDeveloper-GM/json-app/cmd/pkg/loggers"
-	"github.com/3WDeveloper-GM/json-app/internal/data"
+	"github.com/3WDeveloper-GM/json-endpoints/cmd/pkg/loggers"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/data"
 	_ "github.com/lib/pq"
 )
 

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/3WDeveloper-GM/json-app/internal/validator"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/validator"
 )
 
 func (app *Application) ReadStrings(qs url.Values, key string, defaultValue string) string {

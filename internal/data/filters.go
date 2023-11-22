@@ -3,7 +3,7 @@ package data
 import (
 	"fmt"
 
-	"github.com/3WDeveloper-GM/json-app/internal/validator"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/validator"
 )
 
 type Filters struct {

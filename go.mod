@@ -1,4 +1,4 @@
-module github.com/3WDeveloper-GM/json-app
+module github.com/3WDeveloper-GM/json-endpoints
 
 go 1.21.3
 

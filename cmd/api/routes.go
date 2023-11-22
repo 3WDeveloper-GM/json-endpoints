@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/3WDeveloper-GM/json-app/cmd/config"
+	"github.com/3WDeveloper-GM/json-endpoints/cmd/config"
 	"github.com/go-chi/chi/v5"
 )
 

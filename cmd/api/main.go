@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/3WDeveloper-GM/json-app/cmd/config"
+	"github.com/3WDeveloper-GM/json-endpoints/cmd/config"
 )
 
 var env = flag.String("env", "development", "Environment (development|production|staging)")

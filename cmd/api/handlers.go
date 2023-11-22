@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/3WDeveloper-GM/json-app/cmd/config"
-	"github.com/3WDeveloper-GM/json-app/internal/data"
-	"github.com/3WDeveloper-GM/json-app/internal/validator"
+	"github.com/3WDeveloper-GM/json-endpoints/cmd/config"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/data"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/validator"
 )
 
 func healthcheckhandler(app *config.Application) http.HandlerFunc {
