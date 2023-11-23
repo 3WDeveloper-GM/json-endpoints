@@ -2,7 +2,9 @@ package config
 
 import (
 	"database/sql"
+	"flag"
 	"io"
+	"os"
 
 	"github.com/3WDeveloper-GM/json-endpoints/internal/data"
 	"github.com/3WDeveloper-GM/json-endpoints/internal/jsonlog"
@@ -30,7 +32,15 @@ type AppConfig struct {
 	Version  string
 	Mode     string
 	Database struct {
-		Dsn string
+		Dsn          string
+		MaxIdleConns int
+		MaxOpenConns int
+		MaxIdleTime  string
+	}
+	Limiter struct {
+		Rps     float64
+		Burst   int
+		Enabled bool
 	}
 }
 
@@ -42,42 +52,22 @@ type AppModels struct {
 	data.Models
 }
 
-// func (appcfg *AppConfig) set(trait, value interface{}) {
-// 	trait = value
-// }
-
-func (appcfg *AppConfig) setPort(port int) {
-	appcfg.Port = port
-}
-
-func (appcfg *AppConfig) setVersion(version string) {
-	appcfg.Version = version
-}
-
-func (appcfg *AppConfig) setEnvironment(environment string) {
-	appcfg.Mode = environment
-}
-
-func (appcfg *AppConfig) setDatabase(database string) {
-	appcfg.Database.Dsn = database
-}
-
 // SetStructConfig interface for the main application struct
-func (appConfig *AppConfig) SetStructConfig(port int, version, db, environment string) {
-	//string flags
+func (appcfg *AppConfig) SetStructConfig(version string) {
+	//port, environment, and version
+	appcfg.Version = version
+	flag.IntVar(&appcfg.Port, "port", 4000, "API server port")
+	flag.StringVar(&appcfg.Mode, "env", "development", "Environment (development|staging|production)")
 
-	// appConfig.set(appConfig.Database, db)      //set database
-	// appConfig.set(appConfig.Mode, environment) //set environment
-	// appConfig.set(appConfig.Version, version)  //set version
+	flag.StringVar(&appcfg.Database.Dsn, "db-dsn", os.Getenv("TESTING_DSN"), "PostgreSQL DSN")
 
-	appConfig.setDatabase(db)             //set database
-	appConfig.setEnvironment(environment) //set environment
-	appConfig.setVersion(version)         //set version
+	flag.IntVar(&appcfg.Database.MaxIdleConns, "db-max-idle-conns", 25, "PostgreSQL max idle connections")
+	flag.IntVar(&appcfg.Database.MaxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
+	flag.StringVar(&appcfg.Database.MaxIdleTime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 
-	//integer flags
-	appConfig.setPort(port) //set port
-
-	// appConfig.set(appConfig.Port, port) //set port
+	flag.Float64Var(&appcfg.Limiter.Rps, "rps", 2, "rate limiter maximum requests per second")
+	flag.IntVar(&appcfg.Limiter.Burst, "burst", 4, "rate limiter maximum burst")
+	flag.BoolVar(&appcfg.Limiter.Enabled, "limited-enabled", true, "rate limiter enabler")
 }
 
 func (applog *AppLoggers) SetStructConfig(out io.Writer, min jsonlog.Level) {

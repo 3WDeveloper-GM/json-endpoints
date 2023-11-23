@@ -13,29 +13,28 @@ import (
 	"github.com/3WDeveloper-GM/json-endpoints/internal/jsonlog"
 )
 
-var env = flag.String("env", "development", "Environment (development|production|staging)")
-var port = flag.Int("port", 4000, "Defines the port for the web server.")
-var db = flag.String("database-dsn", os.Getenv("TESTING_DSN"), "PostgreSQL DSN")
-
 const version = "1.0.0"
 
-func init() {
+var appcfg, applog = initConfig()
+
+// initializes the configuration struct at runtime.
+func initConfig() (*config.AppConfig, *config.AppLoggers) {
+	applog := &config.AppLoggers{}
+	applog.SetStructConfig(os.Stdout, jsonlog.LevelInfo)
+	applog.PrintInfo("logger object initialized", nil)
+
+	appcfg := &config.AppConfig{}
+	appcfg.SetStructConfig(version)
 	flag.Parse()
+	applog.PrintInfo("config object correctly configured", nil)
+
+	return appcfg, applog
 }
 
 func main() {
-
 	app := &config.Application{}    //Getting an application struct
-	appcfg := &config.AppConfig{}   //Getting a configuration struct
-	applog := &config.AppLoggers{}  //Getting a loggers struct
 	appmodel := &config.AppModels{} //Getting a model struct for CRUD operations
 
-	// Setting the configuration of the main app components
-	appcfg.SetStructConfig(*port, version, *db, *env) //setting the configuration struct
-	applog.SetStructConfig(os.Stdout, jsonlog.LevelInfo)
-	applog.PrintInfo("configuration object correctly configured", nil)
-	applog.PrintInfo("logger configuration correctly established", nil)
-	// database initialization
 	db, err := openDB(appcfg)
 	if err != nil {
 		applog.Logger.PrintFatal(err, nil)
