@@ -2,6 +2,8 @@ package data
 
 import (
 	"fmt"
+	"math"
+	"strings"
 
 	"github.com/3WDeveloper-GM/json-endpoints/internal/validator"
 )
@@ -11,6 +13,27 @@ type Filters struct {
 	PageSize     int
 	Sort         string
 	SortSafeList []string
+}
+
+type Metadata struct {
+	CurrentPage  int `json:"current_page,omitempty"`
+	PageSize     int `json:"page_size,omitempty"`
+	FirstPage    int `json:"first_page,omitempty"`
+	LastPage     int `json:"last_page,omitempty"`
+	TotalRecords int `json:"total_records,omitempty"`
+}
+
+func CalculateMetadata(totalrecords, page, pagesize int) Metadata {
+	if totalrecords == 0 {
+		return Metadata{}
+	}
+	return Metadata{
+		CurrentPage:  page,
+		PageSize:     pagesize,
+		FirstPage:    1,
+		LastPage:     int(math.Ceil(float64(totalrecords) / float64(pagesize))),
+		TotalRecords: totalrecords,
+	}
 }
 
 func ValidateFilters(v *validator.Validator, f Filters) {
@@ -27,4 +50,28 @@ func ValidateFilters(v *validator.Validator, f Filters) {
 
 	var sortMsg = "invalid sort value"
 	v.Check(validator.In(f.Sort, f.SortSafeList...), "sort", sortMsg)
+}
+
+func (f Filters) SortColumn() string {
+	for _, safevalue := range f.SortSafeList {
+		if f.Sort == safevalue {
+			return strings.TrimPrefix(f.Sort, "-")
+		}
+	}
+	panic("unsafe sort parameter: " + f.Sort)
+}
+
+func (f Filters) SortDirection() string {
+	if strings.HasPrefix(f.Sort, "-") {
+		return "DESC"
+	}
+	return "ASC"
+}
+
+func (f Filters) Limit() int {
+	return f.PageSize
+}
+
+func (f Filters) Offset() int {
+	return (f.Page - 1) * f.PageSize
 }

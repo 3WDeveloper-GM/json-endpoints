@@ -3,12 +3,13 @@ package config
 import (
 	"fmt"
 	"net/http"
-	"runtime/debug"
 )
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {
-	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	app.Logger.Error.Output(2, trace)
+	// trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+	// app.Logger.Error.Output(2, trace)
+
+	app.Logger.PrintError(err, nil)
 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
@@ -22,7 +23,10 @@ func (app *Application) NotFound(w http.ResponseWriter) {
 }
 
 func (app *Application) ErrLog(r *http.Request, err error) {
-	app.Logger.Error.Println(err)
+	app.Logger.PrintError(err, map[string]string{
+		"request_method": r.Method,
+		"request_url":    r.URL.String(),
+	})
 }
 
 func (app *Application) ErrorResponse(w http.ResponseWriter, r *http.Request, status int, message interface{}) {

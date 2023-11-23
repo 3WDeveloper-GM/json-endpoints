@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/3WDeveloper-GM/json-endpoints/cmd/config"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/jsonlog"
 )
 
 var env = flag.String("env", "development", "Environment (development|production|staging)")
@@ -31,21 +32,26 @@ func main() {
 
 	// Setting the configuration of the main app components
 	appcfg.SetStructConfig(*port, version, *db, *env) //setting the configuration struct
-	applog.SetStructConfig()                          //setting the loggers
-
+	applog.SetStructConfig(os.Stdout, jsonlog.LevelInfo)
+	applog.PrintInfo("configuration object correctly configured", nil)
+	applog.PrintInfo("logger configuration correctly established", nil)
 	// database initialization
 	db, err := openDB(appcfg)
 	if err != nil {
-		applog.Error.Fatal(err)
+		applog.Logger.PrintFatal(err, nil)
 	}
 
 	defer db.Close()
 
 	appmodel.SetStructConfig(db)                  //setting the model struct
 	app.SetStructConfig(appcfg, applog, appmodel) //configuring the app struct in a single data structure
+	applog.PrintInfo("connection pool established", nil)
 
-	applog.Info.Print("database connection pool established")
-
+	applog.PrintInfo("starting server with configuration:", map[string]string{
+		"addr":    fmt.Sprint(appcfg.Port),
+		"env":     appcfg.Mode,
+		"version": appcfg.Version,
+	})
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", app.Config.Port),
 		Handler:      getRoutes(app),
@@ -54,9 +60,8 @@ func main() {
 		WriteTimeout: 5 * time.Second,
 	}
 
-	applog.Info.Printf("Starting server on port :%v", app.Config.Port)
 	err = srv.ListenAndServe()
-	applog.Error.Fatal(err)
+	applog.PrintFatal(err, nil)
 
 }
 

@@ -56,13 +56,13 @@ func listMoviesHandlerGet(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		movies, err := app.Models.Movies.GetAll(input.Title, input.Genres, input.Filters)
+		movies, metadata, err := app.Models.Movies.GetAll(input.Title, input.Genres, input.Filters)
 		if err != nil {
 			app.InternalSErrorResponse(w, r, err)
 			return
 		}
 
-		err = app.JsonWriter(w, http.StatusOK, config.Envelope{"movies": movies}, nil)
+		err = app.JsonWriter(w, http.StatusOK, config.Envelope{"metadata": metadata, "movies": movies}, nil)
 		if err != nil {
 			app.InternalSErrorResponse(w, r, err)
 		}

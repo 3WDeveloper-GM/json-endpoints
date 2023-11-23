@@ -2,10 +2,10 @@ package config
 
 import (
 	"database/sql"
-	"log"
+	"io"
 
-	"github.com/3WDeveloper-GM/json-endpoints/cmd/pkg/loggers"
 	"github.com/3WDeveloper-GM/json-endpoints/internal/data"
+	"github.com/3WDeveloper-GM/json-endpoints/internal/jsonlog"
 	_ "github.com/lib/pq"
 )
 
@@ -35,8 +35,7 @@ type AppConfig struct {
 }
 
 type AppLoggers struct {
-	Info  *log.Logger
-	Error *log.Logger
+	jsonlog.Logger
 }
 
 type AppModels struct {
@@ -81,10 +80,9 @@ func (appConfig *AppConfig) SetStructConfig(port int, version, db, environment s
 	// appConfig.set(appConfig.Port, port) //set port
 }
 
-// Interface for configuring the loggers, it just needs to be called
-func (appLog *AppLoggers) SetStructConfig() {
-	appLog.Error = loggers.ErrorLog()
-	appLog.Info = loggers.InfoLog()
+func (applog *AppLoggers) SetStructConfig(out io.Writer, min jsonlog.Level) {
+	applog.Out = out
+	applog.Minlevel = min
 }
 
 // Interface for configuring the model struct, for the CRUD operations
