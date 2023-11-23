@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 
 	"golang.org/x/time/rate"
 )
@@ -24,9 +25,14 @@ func (app *Application) RecoverPanic(next http.Handler) http.Handler {
 
 func (app *Application) RateLimiter(next http.Handler) http.Handler {
 
+	type client struct {
+		limiter  *rate.Limiter
+		lastSeen time.Time
+	}
+
 	var (
 		mu      sync.Mutex
-		clients = make(map[string]*rate.Limiter)
+		clients = make(map[string]*client)
 	)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -41,10 +47,14 @@ func (app *Application) RateLimiter(next http.Handler) http.Handler {
 			mu.Lock()
 
 			if _, found := clients[ip]; !found {
-				clients[ip] = rate.NewLimiter(2, 4)
+				clients[ip] = &client{
+					limiter: rate.NewLimiter(rate.Limit(app.Config.Limiter.Rps), app.Config.Limiter.Burst),
+				}
 			}
 
-			if !clients[ip].Allow() {
+			clients[ip].lastSeen = time.Now()
+
+			if !clients[ip].limiter.Allow() {
 				mu.Unlock()
 				app.RateLimitExceedsResponse(w, r)
 				return

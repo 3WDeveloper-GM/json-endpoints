@@ -16,6 +16,7 @@ func healthcheckhandler(app *config.Application) http.HandlerFunc {
 		envelope := &config.Envelope{
 			"status": "available",
 			"sys_info": map[string]string{
+				"port":        fmt.Sprint(app.Config.Port),
 				"environment": app.Config.Mode,
 				"version":     app.Config.Version,
 			},

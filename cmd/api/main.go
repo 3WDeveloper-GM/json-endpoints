@@ -15,10 +15,10 @@ import (
 
 const version = "1.0.0"
 
-var appcfg, applog = initConfig()
+var appcfg, applog, appmodel, db = initConfig()
 
 // initializes the configuration struct at runtime.
-func initConfig() (*config.AppConfig, *config.AppLoggers) {
+func initConfig() (*config.AppConfig, *config.AppLoggers, *config.AppModels, *sql.DB) {
 	applog := &config.AppLoggers{}
 	applog.SetStructConfig(os.Stdout, jsonlog.LevelInfo)
 	applog.PrintInfo("logger object initialized", nil)
@@ -28,23 +28,25 @@ func initConfig() (*config.AppConfig, *config.AppLoggers) {
 	flag.Parse()
 	applog.PrintInfo("config object correctly configured", nil)
 
-	return appcfg, applog
+	db, err := openDB(appcfg)
+	if err != nil {
+		applog.PrintFatal(err, nil)
+	}
+
+	appmodel := &config.AppModels{}
+	appmodel.SetStructConfig(db)
+	applog.PrintInfo("database connection pool established", nil)
+
+	return appcfg, applog, appmodel, db
 }
 
 func main() {
-	app := &config.Application{}    //Getting an application struct
-	appmodel := &config.AppModels{} //Getting a model struct for CRUD operations
-
-	db, err := openDB(appcfg)
-	if err != nil {
-		applog.Logger.PrintFatal(err, nil)
-	}
 
 	defer db.Close()
+	app := &config.Application{} //Getting an application struct
 
-	appmodel.SetStructConfig(db)                  //setting the model struct
-	app.SetStructConfig(appcfg, applog, appmodel) //configuring the app struct in a single data structure
-	applog.PrintInfo("connection pool established", nil)
+	app.SetStructConfig(appcfg, applog, appmodel)            //configuring the app struct in a single data structure
+	applog.PrintInfo("Application object initialized.", nil) //confirmation message
 
 	applog.PrintInfo("starting server with configuration:", map[string]string{
 		"addr":    fmt.Sprint(appcfg.Port),
@@ -59,7 +61,7 @@ func main() {
 		WriteTimeout: 5 * time.Second,
 	}
 
-	err = srv.ListenAndServe()
+	err := srv.ListenAndServe()
 	applog.PrintFatal(err, nil)
 
 }
