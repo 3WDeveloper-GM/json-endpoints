@@ -61,5 +61,5 @@ func serve(app *config.Application) error {
 		"addr": server.Addr,
 	})
 
-	return server.ListenAndServe()
+	return nil
 }
