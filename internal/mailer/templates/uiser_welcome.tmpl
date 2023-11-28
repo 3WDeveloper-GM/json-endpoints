@@ -1,0 +1,35 @@
+{{ define "subject" }}
+   Welcome to Greenlight
+{{ end }}
+
+{{ define "plainbody" }}
+  Thanks for signing up for a Greenlight account. We're excited to have you on board!
+  
+  For future reference, your ID number is {{.ID}}.
+
+  Thanks,
+
+  The Greenlight Team.
+{{ end }}
+
+{{ define "htmlbody" }}
+   <!DOCTYPE html>
+   <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+   <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+   <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+   <!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+   <html>
+      <head>
+         <meta name="viewport", content="width=device-width"/> 
+         <meta http-equiv="Content-Type" content="text/html"; charset="UTF-8"/>
+      </head>
+      <body>
+        <p>Hi,</p>
+        <p>Thanks for signing up for a Greenlight account. We're excited to have you on board!</p>
+        <p>For future reference, your user number is {{.ID}}.</p>
+        <p>Thanks,</p>
+        <p>The Greenlight Team.</p> 
+      </body>
+   </html>
+{{ end }}
+

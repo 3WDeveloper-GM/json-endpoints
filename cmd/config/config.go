@@ -78,6 +78,7 @@ func (applog *AppLoggers) SetStructConfig(out io.Writer, min jsonlog.Level) {
 // Interface for configuring the model struct, for the CRUD operations
 func (appModel *AppModels) SetStructConfig(db *sql.DB) {
 	appModel.Movies = data.MovieModel{DB: db}
+	appModel.Users = data.UserModel{DB: db}
 }
 
 // Interface for getting the configuration of the main application struct
