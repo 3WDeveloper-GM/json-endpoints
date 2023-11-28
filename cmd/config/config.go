@@ -5,12 +5,13 @@ import (
 	"flag"
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/3WDeveloper-GM/json-endpoints/internal/data"
 	"github.com/3WDeveloper-GM/json-endpoints/internal/jsonlog"
 	"github.com/3WDeveloper-GM/json-endpoints/internal/mailer"
-	"github.com/go-mail/mail"
+	"github.com/go-mail/mail/v2"
 	_ "github.com/lib/pq"
 )
 
@@ -29,6 +30,7 @@ type Application struct {
 	Logger *AppLoggers
 	Models *AppModels
 	Mailer *AppSMTP
+	sync.WaitGroup
 }
 
 type AppConfig struct {
@@ -87,10 +89,10 @@ func (appcfg *AppConfig) SetStructConfig(version string) {
 	flag.BoolVar(&appcfg.Limiter.Enabled, "limited-enabled", true, "rate limiter enabler")
 
 	//SMTP configuration flags
-	flag.StringVar(&appcfg.SMTP.Host, "host", "sandbox.smtp.mailtrap.io", "SMTP host")
-	flag.IntVar(&appcfg.SMTP.Port, "smtp_port", 25, "SMTP port")
-	flag.StringVar(&appcfg.SMTP.Username, "smtp-username", "9a92dfb66a8cf6", "SMTP username")
-	flag.StringVar(&appcfg.SMTP.Password, "smtp-password", "1086188e773e46", "SMTP password")
+	flag.StringVar(&appcfg.SMTP.Host, "smtp-host", "sandbox.smtp.mailtrap.io", "SMTP host")
+	flag.IntVar(&appcfg.SMTP.Port, "smtp-port", 2525, "SMTP port")
+	flag.StringVar(&appcfg.SMTP.Username, "smtp-username", "0b6416a1d5a92d", "SMTP username")
+	flag.StringVar(&appcfg.SMTP.Password, "smtp-password", "756080f5f1c2c3", "SMTP password")
 	flag.StringVar(&appcfg.SMTP.Sender, "smtp-sender", "Greenlight <no-reply@greenlight.3wdevel.net>", "SMTP sender address")
 
 }

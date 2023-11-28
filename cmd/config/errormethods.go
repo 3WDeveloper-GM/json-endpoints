@@ -73,3 +73,19 @@ func (app *Application) RateLimitExceedsResponse(w http.ResponseWriter, r *http.
 	message := "rate limit exceeded"
 	app.ErrorResponse(w, r, http.StatusTooManyRequests, message)
 }
+
+func (app *Application) Background(fn func()) {
+
+	app.Add(1)
+	go func() {
+		defer app.Done()
+
+		defer func() {
+			if err := recover(); err != nil {
+				app.Logger.PrintError(fmt.Errorf("%s", err), nil)
+			}
+		}()
+
+		fn()
+	}()
+}

@@ -55,13 +55,14 @@ func userRegisterPost(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		err = app.Mailer.Send(user.Email, "usr_welcome.tmpl", user)
-		if err != nil {
-			app.InternalSErrorResponse(w, r, err)
-			return
-		}
+		app.Background(func() {
+			err = app.Mailer.Send(user.Email, "usr_welcome.tmpl", user)
+			if err != nil {
+				app.Logger.PrintError(err, nil)
+			}
+		})
 
-		err = app.JsonWriter(w, http.StatusCreated, config.Envelope{"user": user}, nil)
+		err = app.JsonWriter(w, http.StatusAccepted, config.Envelope{"user": user}, nil)
 		if err != nil {
 			app.InternalSErrorResponse(w, r, err)
 		}

@@ -8,7 +8,8 @@ import (
 	"github.com/go-mail/mail/v2"
 )
 
-var templateiFS embed.FS
+//go:embed "templates"
+var templateFS embed.FS
 
 type Mailer struct {
 	Dialer *mail.Dialer
@@ -16,7 +17,7 @@ type Mailer struct {
 }
 
 func (m Mailer) Send(recipient, templatefile string, data interface{}) error {
-	tmpl, err := template.New("email").ParseFS(templateiFS, "templates/"+templatefile)
+	tmpl, err := template.New("email").ParseFS(templateFS, "templates/"+templatefile)
 	if err != nil {
 		return err
 	}
@@ -28,13 +29,13 @@ func (m Mailer) Send(recipient, templatefile string, data interface{}) error {
 	}
 
 	plainbody := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(plainbody, "plainbody", data)
+	err = tmpl.ExecuteTemplate(plainbody, "plainBody", data)
 	if err != nil {
 		return err
 	}
 
 	htmlbody := new(bytes.Buffer)
-	err = tmpl.ExecuteTemplate(htmlbody, "htmlbody", data)
+	err = tmpl.ExecuteTemplate(htmlbody, "htmlBody", data)
 	if err != nil {
 		return err
 	}
