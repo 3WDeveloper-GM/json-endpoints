@@ -13,20 +13,28 @@ import (
 
 const version = "1.0.0"
 
-var appcfg, applog, appmodel, db = initConfig()
+var appcfg, applog, appmodel, appsmtp, db = initConfig()
 
 // initializes the configuration struct at runtime.
-func initConfig() (*config.AppConfig, *config.AppLoggers, *config.AppModels, *sql.DB) {
+func initConfig() (*config.AppConfig, *config.AppLoggers, *config.AppModels, *config.AppSMTP, *sql.DB) {
 
+	//loggers first
 	applog := &config.AppLoggers{}
 	applog.SetStructConfig(os.Stdout, jsonlog.LevelInfo)
 	applog.PrintInfo("logger object initialized", nil)
 
+	//configuration flags second
 	appcfg := &config.AppConfig{}
 	appcfg.SetStructConfig(version)
 	flag.Parse()
 	applog.PrintInfo("config object correctly configured", nil)
 
+	//smtp third
+	appsmtp := &config.AppSMTP{}
+	appsmtp.SetStructConfig(appcfg)
+	applog.PrintInfo("SMTP mailer object initialized", nil)
+
+	//finally DB and models
 	db, err := openDB(appcfg)
 	if err != nil {
 		applog.PrintFatal(err, nil)
@@ -36,7 +44,7 @@ func initConfig() (*config.AppConfig, *config.AppLoggers, *config.AppModels, *sq
 	appmodel.SetStructConfig(db)
 	applog.PrintInfo("database connection pool established", nil)
 
-	return appcfg, applog, appmodel, db
+	return appcfg, applog, appmodel, appsmtp, db
 }
 
 func main() {
@@ -44,7 +52,7 @@ func main() {
 	defer db.Close()             //deferring the database shutdown when the program terminates
 	app := &config.Application{} //Getting an application struct
 
-	app.SetStructConfig(appcfg, applog, appmodel)            //configuring the app struct in a single data structure
+	app.SetStructConfig(appcfg, applog, appmodel, appsmtp)   //configuring the app struct in a single data structure
 	applog.PrintInfo("Application object initialized.", nil) //confirmation message
 
 	err := serve(app)

@@ -9,7 +9,7 @@ import (
 	"github.com/3WDeveloper-GM/json-endpoints/internal/validator"
 )
 
-func usercreatePost(app *config.Application) http.HandlerFunc {
+func userRegisterPost(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var input struct {
@@ -52,6 +52,12 @@ func usercreatePost(app *config.Application) http.HandlerFunc {
 			default:
 				app.InternalSErrorResponse(w, r, err)
 			}
+			return
+		}
+
+		err = app.Mailer.Send(user.Email, "usr_welcome.tmpl", user)
+		if err != nil {
+			app.InternalSErrorResponse(w, r, err)
 			return
 		}
 
