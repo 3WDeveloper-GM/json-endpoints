@@ -113,6 +113,7 @@ func (applog *AppLoggers) SetStructConfig(out io.Writer, min jsonlog.Level) {
 func (appModel *AppModels) SetStructConfig(db *sql.DB) {
 	appModel.Movies = data.MovieModel{DB: db}
 	appModel.Users = data.UserModel{DB: db}
+	appModel.Tokens = data.TokenModel{DB: db}
 }
 
 // Interface for getting the configuration of the main application struct
