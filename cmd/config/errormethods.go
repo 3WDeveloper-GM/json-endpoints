@@ -89,3 +89,8 @@ func (app *Application) Background(fn func()) {
 		fn()
 	}()
 }
+
+func (app *Application) InvalidCredentialsResponse(w http.ResponseWriter, r *http.Request) {
+	var message = "invalid authentication credentials"
+	app.ErrorResponse(w, r, http.StatusUnauthorized, message)
+}

@@ -21,10 +21,13 @@ func getRoutes(app *config.Application) *chi.Mux {
 
 	r.Post("/v1/movies", createMovieHandlerPost(app)) //Add some movie to the DB using a JSON request body
 	r.Post("/v1/users", userRegisterPost(app))        //Add user to the DB using a JSON request body
+	r.Post("/v1/users/authentication", createAuthenticationTokenPost(app))
 
 	r.Patch("/v1/movies/{id}", movielistHandlerPatch(app)) //Patching some of the resources in the DB
 
 	r.Delete("/v1/movies/{id}", movieupdateHandlerDelete(app)) //Deleting an entry in the DB
+
+	r.Put("/v1/users/activated", activateUserPut(app))
 
 	return r
 }

@@ -52,7 +52,7 @@ func serve(app *config.Application) error {
 
 	}()
 
-	app.Logger.PrintInfo("Starting server with the following configuration", map[string]string{
+	app.Logger.PrintInfo("Starting server with the following ", map[string]string{
 		"addr":    server.Addr,
 		"env":     app.Config.Mode,
 		"version": app.Config.Version,
