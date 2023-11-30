@@ -114,3 +114,22 @@ func (app *Application) Authenticate(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (app *Application) RequireActivatedUsr(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		user := app.ContextGetUser(r)
+
+		if user.IsAnonymous() {
+			app.AuthenticationRequiredResponse(w, r)
+			return
+		}
+
+		if !user.Activated {
+			app.InactiveAccountResponse(w, r)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
