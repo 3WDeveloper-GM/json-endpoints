@@ -8,6 +8,7 @@ import (
 func getRoutes(app *config.Application) *chi.Mux {
 	r := chi.NewMux()
 
+	r.Use(app.RouteLogger)
 	r.Use(app.RecoverPanic)
 	r.Use(app.RateLimiter)
 	r.Use(app.Authenticate)

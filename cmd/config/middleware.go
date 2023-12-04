@@ -133,3 +133,18 @@ func (app *Application) RequireActivatedUsr(next http.HandlerFunc) http.HandlerF
 		next.ServeHTTP(w, r)
 	})
 }
+func (app *Application) RouteLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		defer func() {
+			var message = "made a request at %v with the following configurations:"
+
+			app.Logger.PrintInfo(fmt.Sprintf(message, r.URL.Path), map[string]string{
+				"method": r.Method,
+				"host":   r.Host,
+			})
+		}()
+
+		next.ServeHTTP(w, r)
+	})
+}
